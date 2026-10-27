@@ -163,7 +163,7 @@ class FernApplication:
         tk.Button(
             controls,
             text="Сбросить к стандартному виду",
-            command=lambda: self.apply_preset(PRESETS["Классический папоротник"]),
+            command=self.reset,
             font=("Arial", 10, "bold"),
             bg="#176a3f",
             fg="white",
@@ -225,9 +225,16 @@ class FernApplication:
         ).pack(anchor="w", pady=(0, 9))
 
     def select_preset(self, _event=None):
+        """Применить выбранный вариант растения."""
         self.apply_preset(PRESETS[self.preset_selector.get()])
 
+    def reset(self):
+        """Вернуть классический папоротник и 20000 точек."""
+        self.iterations.set(20000)
+        self.apply_preset(PRESETS["Классический папоротник"])
+
     def apply_preset(self, settings):
+        """Установить коэффициенты выбранного растения."""
         bend, spread, vertical = settings
         self.bend.set(bend)
         self.spread.set(spread)
@@ -240,6 +247,10 @@ class FernApplication:
 
     def schedule_redraw(self, _value=None):
         """Запланировать отрисовку после изменения параметров."""
+        settings = (self.bend.get(), self.spread.get(), self.vertical.get())
+        selected = next((name for name, values in PRESETS.items()
+                         if values == settings), "Свои параметры")
+        self.preset_selector.set(selected)
         # Обновляем с небольшой задержкой, чтобы ползунки не тормозили.
         if self.pending_update is not None:
             self.root.after_cancel(self.pending_update)
