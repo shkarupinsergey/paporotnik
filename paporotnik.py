@@ -86,7 +86,8 @@ class FernApplication:
         self.iterations = tk.IntVar(value=20000)
 
         self._create_interface()
-        self.root.after(100, self.draw_fern)
+        self.root.protocol("WM_DELETE_WINDOW", self.close)
+        self.schedule_redraw()
 
     def _create_interface(self):
         main = tk.Frame(self.root, bg="#edf2ef", padx=12, pady=12)
@@ -238,10 +239,17 @@ class FernApplication:
         self.schedule_redraw()
 
     def schedule_redraw(self, _value=None):
+        """Запланировать отрисовку после изменения параметров."""
         # Обновляем с небольшой задержкой, чтобы ползунки не тормозили.
         if self.pending_update is not None:
             self.root.after_cancel(self.pending_update)
         self.pending_update = self.root.after(180, self.draw_fern)
+
+    def close(self):
+        """Отменить ожидающее обновление и закрыть окно."""
+        if self.pending_update is not None:
+            self.root.after_cancel(self.pending_update)
+        self.root.destroy()
 
     def draw_fern(self):
         self.pending_update = None
