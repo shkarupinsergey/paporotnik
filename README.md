@@ -26,50 +26,6 @@
 - Подбор масштаба под размер растения.
 - Сброс к классическому виду и 20000 точек.
 
-## Требования
-
-Python 3.9 или новее с tkinter. Подойдут Windows, Linux и macOS.
-Используются только стандартные модули random, tkinter и tkinter.ttk.
-
-## Установка и запуск
-
-Скачать проект:
-
-```bash
-git clone https://github.com/shkarupinsergey/paporotnik.git
-cd paporotnik
-```
-
-Создать окружение и активировать его в Windows (cmd):
-
-```bat
-python -m venv venv
-venv\Scripts\activate.bat
-```
-
-Для PowerShell команда активации: `.\venv\Scripts\Activate.ps1`.
-Если она запрещена, воспользуйтесь cmd.
-
-Linux и macOS:
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-Папка venv добавлена по условию задания. На другом компьютере её нужно
-пересоздать. Если нет tkinter, в Windows добавьте Tcl/Tk через установщик
-Python, в Ubuntu/Debian установите пакет python3-tk.
-
-После активации:
-
-```bash
-python -m pip install -r requirements.txt
-python paporotnik.py
-```
-
-Сторонних библиотек нет, поэтому pip ничего не устанавливает.
-
 ## Управление
 
 | Элемент | Действие |
@@ -87,6 +43,7 @@ paporotnik/
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
+├── images/
 └── venv/
 ```
 
@@ -104,6 +61,12 @@ paporotnik/
 из четырёх преобразований с вероятностями 1%, 85%, 7% и 7%.
 Новые координаты добавляются на рисунок. Другие коэффициенты дают
 другую форму растения.
+
+## Примеры
+
+![Обычный папоротник](images/classic.png)
+
+![Высокий папоротник](images/tall.png)
 
 Задание: «3.2 Сложная анимация», раздел «Папоротник Барнсли».
 Основной пункт и изменение формы растения выполнены.

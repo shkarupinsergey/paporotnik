@@ -9,8 +9,6 @@ import tkinter as tk
 from tkinter import ttk
 
 
-# Наборы коэффициентов, дающие разные формы фрактального растения.
-# (изгиб основного стебля, ширина боковых ветвей, вертикальный коэффициент)
 PRESETS = {
     "Классический папоротник": (0.04, 1.00, 0.85),
     "Узкий папоротник": (0.02, 0.60, 0.88),
@@ -29,6 +27,7 @@ class BarnsleyFern:
     """Создаёт точки фрактала с помощью четырёх аффинных преобразований."""
 
     def __init__(self, bend=0.04, spread=1.0, vertical=0.85):
+        """Задать коэффициенты и начальную точку."""
         self.bend = bend
         self.spread = spread
         self.vertical = vertical
@@ -36,32 +35,27 @@ class BarnsleyFern:
         self.y = 0.0
 
     def transform(self, random_number):
-        """Выбирает одно из четырёх преобразований по вероятностям 1/85/7/7 %."""
+        """Выбрать преобразование с вероятностями 1/85/7/7 %."""
         x, y = self.x, self.y
 
         if random_number < 0.01:
-            # Формирование основания стебля.
             self.x = 0.0
             self.y = 0.16 * y
         elif random_number < 0.86:
-            # Главный стебель: изменяем b (изгиб) и d (вытянутость).
             self.x = 0.85 * x + self.bend * y
             self.y = -self.bend * x + self.vertical * y + 1.6
         elif random_number < 0.93:
-            # Левая ветвь: изменяем коэффициент ширины w.
             self.x = 0.20 * x - 0.26 * self.spread * y
             self.y = 0.23 * x + 0.22 * y + 1.6
         else:
-            # Правая ветвь: тот же коэффициент w.
             self.x = -0.15 * x + 0.28 * self.spread * y
             self.y = 0.26 * x + 0.24 * y + 0.44
 
     def generate_points(self, iterations, seed=42):
-        """Возвращает координаты точек; seed делает сравнение форм наглядным."""
+        """Получить точки на повторяемой случайной последовательности."""
         rng = random.Random(seed)
         self.x, self.y = 0.0, 0.0
 
-        # Первые точки пропускаем, пока система выходит на аттрактор.
         for _ in range(20):
             self.transform(rng.random())
 
@@ -73,7 +67,10 @@ class BarnsleyFern:
 
 
 class FernApplication:
+    """Окно с рисунком и настройками папоротника."""
+
     def __init__(self, root):
+        """Создать настройки и элементы окна."""
         self.root = root
         self.root.title("Папоротник Барнсли — интерактивный фрактал")
         self.root.configure(bg="#edf2ef")
@@ -199,7 +196,8 @@ class FernApplication:
         )
         self.status.pack(fill=tk.X)
 
-    def _add_slider(self, parent, title, variable, minimum, maximum, resolution):
+    def _add_slider(self, parent, title, variable, minimum, maximum,
+                    resolution):
         tk.Label(
             parent,
             text=title,
@@ -251,7 +249,6 @@ class FernApplication:
         selected = next((name for name, values in PRESETS.items()
                          if values == settings), "Свои параметры")
         self.preset_selector.set(selected)
-        # Обновляем с небольшой задержкой, чтобы ползунки не тормозили.
         if self.pending_update is not None:
             self.root.after_cancel(self.pending_update)
         self.pending_update = self.root.after(180, self.draw_fern)
@@ -263,6 +260,7 @@ class FernApplication:
         self.root.destroy()
 
     def draw_fern(self):
+        """Рассчитать точки и нарисовать растение в пределах холста."""
         self.pending_update = None
         fern = BarnsleyFern(
             bend=self.bend.get(),
@@ -272,7 +270,6 @@ class FernApplication:
         count = self.iterations.get()
         points = fern.generate_points(count)
 
-        # Подгоняем масштаб под текущую форму, чтобы фрактал помещался на экране.
         min_x = min(x for x, _ in points)
         max_x = max(x for x, _ in points)
         min_y = min(y for _, y in points)
@@ -291,7 +288,6 @@ class FernApplication:
         for x, y in points:
             pixel_x = round(left + (x - min_x) * scale)
             pixel_y = round(top + (max_y - y) * scale)
-            # Рисуем точку размером 1×1 пиксель.
             self.canvas.create_rectangle(
                 pixel_x, pixel_y, pixel_x + 1, pixel_y + 1,
                 outline=POINT_COLOR,
@@ -308,6 +304,7 @@ class FernApplication:
 
 
 def main():
+    """Запустить окно программы."""
     root = tk.Tk()
     FernApplication(root)
     root.mainloop()
